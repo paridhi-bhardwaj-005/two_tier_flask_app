@@ -20,7 +20,10 @@ spec:
           image: mysql:latest
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
             - name: MYSQL_USER
               value: "admin"
             - name: MYSQL_PASSWORD
@@ -30,9 +33,9 @@ spec:
           ports:
             - containerPort: 3306
           volumeMounts:
-            - name: mysqldata
-              mountPath: /var/lib/mysql
+            - name: mysql-initdb
+              mountPath: docker-entrypoint-initdb.d
       volumes:
-        - name: mysqldata
-          persistentVolumeClaim:
-            claimName: mysql-pvc
+        - name: mysql-initdb
+          configMap:
+            name: mysql-initdb-config
